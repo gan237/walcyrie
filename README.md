@@ -66,9 +66,18 @@ Simply do:
 
 On completion, you should have the nine pdf plots, six under $cwd/run/svcomp15 and three under $cwd/run/litmus.
 
-To generate the plots in the paper, do:
+The $cwd/walcyrie/bin/log directory contains all the log files we obtained for generating the plots in the paper. To reproduce these plots, do the following:
 
 	cd $ARTEFACT_ROOT
 	cp logs/cbmc-po/log.litmus.*   logs/walcyrie/log.litmus.*   runs/litmus
 	cp logs/cbmc-po/log.svcomp15.* logs/walcyrie/log.svcomp15.* runs/svcomp15
 	./bin/plots.sh
+
+
+******
+
+An alternate form to obtain our artefact as a VM image is from 
+
+	http://www.cprover.org/wmm/tc/ppopp16/
+
+This is a Fedora release 23 VM that has walcyrie already compiled and ready to use. To run the experiments, log in as ppopp16 (passwd: ae), and simply run ~/walcyrie/bin/experiments.sh. The $ARTEFACT_ROOT is set to ~/walcyrie.
