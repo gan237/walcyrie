@@ -25,6 +25,10 @@ echo "${green}Setting up MiniSAT2${reset}..."
 sleep 1
 make minisat2-download
 
+echo "${green}Cleaning up${reset}..."
+sleep 1
+make clean
+
 echo "${green}Compiling walcyrie${reset}..."
 sleep 1
 make -j$nproc
