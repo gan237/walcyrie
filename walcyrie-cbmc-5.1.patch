@@ -1,0 +1,807 @@
+diff -Naur stock-cbmc-5.1/src/cbmc/Makefile walcyrie-cbmc-5.1/src/cbmc/Makefile
+--- stock-cbmc-5.1/src/cbmc/Makefile	2015-11-14 22:55:38.575183630 +0000
++++ walcyrie-cbmc-5.1/src/cbmc/Makefile	2015-11-15 00:55:38.453228586 +0000
+@@ -28,9 +28,15 @@
+ include ../config.inc
+ include ../common
+ 
+-CLEANFILES = cbmc$(EXEEXT)
+ 
+-all: cbmc$(EXEEXT)
++ifneq (,$(findstring WALCYRIE,$(CXXFLAGS)))
++  all: cbmc$(EXEEXT) walcyrie$(EXEEXT)
++  CLEANFILES = cbmc$(EXEEXT) walcyrie$(EXEEXT)
++else
++  all: cbmc$(EXEEXT) cbmc-po$(EXEEXT)
++  CLEANFILES = cbmc$(EXEEXT) cbmc-po$(EXEEXT)
++endif
++
+ 
+ ifneq ($(wildcard ../bv_refinement/Makefile),)
+   OBJ += ../bv_refinement/bv_refinement$(LIBEXT)
+@@ -62,6 +68,12 @@
+ cbmc$(EXEEXT): $(OBJ)
+ 	$(LINKBIN)
+ 
++walcyrie$(EXEEXT): $(OBJ) cbmc$(EXEEXT)
++	cp cbmc$(EXEEXT) walcyrie$(EXEEXT)
++
++cbmc-po$(EXEEXT): $(OBJ) cbmc$(EXEEXT)
++	cp cbmc$(EXEEXT) cbmc-po$(EXEEXT)
++
+ .PHONY: cbmc-mac-signed
+ 
+ cbmc-mac-signed: cbmc$(EXEEXT)
+diff -Naur stock-cbmc-5.1/src/config.inc walcyrie-cbmc-5.1/src/config.inc
+--- stock-cbmc-5.1/src/config.inc	2015-11-14 22:55:38.917184863 +0000
++++ walcyrie-cbmc-5.1/src/config.inc	2015-11-16 18:28:36.128209102 +0000
+@@ -8,6 +8,11 @@
+ # If GLPK is available; this is used by goto-instrument and musketeer.
+ #LIB_GLPK = -lglpk 
+ 
++#True Concurrency
++#CXXFLAGS  += -DWMM_RATIONAL_CLK
++CXXFLAGS   += -DWMM_MINSAT2_STATS
++CXXFLAGS   += -DWALCYRIE 
++
+ # SAT-solvers we have
+ #PRECOSAT = ../../precosat-576-7e5e66f-120112
+ #PICOSAT = ../../picosat-959
+diff -Naur stock-cbmc-5.1/src/goto-symex/memory_model_pso.cpp walcyrie-cbmc-5.1/src/goto-symex/memory_model_pso.cpp
+--- stock-cbmc-5.1/src/goto-symex/memory_model_pso.cpp	2015-11-14 22:55:38.736184210 +0000
++++ walcyrie-cbmc-5.1/src/goto-symex/memory_model_pso.cpp	2015-11-14 23:04:40.680138002 +0000
+@@ -26,13 +26,24 @@
+ 
+   build_event_lists(equation);
+   build_clock_type(equation);
+-  
++ 
++#ifdef WALCYRIE
++  build_rw(equation);
++  build_ppo(equation);
++
++  generate_succ_constraints(equation);
++  generate_match_constraints(equation);
++  write_serialization_external(equation);
++#else
+   read_from(equation);
+   write_serialization_external(equation);
+   program_order(equation);
++
+ #ifndef CPROVER_MEMORY_MODEL_SUP_CLOCK
+   from_read(equation);
+ #endif
++
++#endif
+ }
+ 
+ /*******************************************************************\
+diff -Naur stock-cbmc-5.1/src/goto-symex/memory_model_sc.cpp walcyrie-cbmc-5.1/src/goto-symex/memory_model_sc.cpp
+--- stock-cbmc-5.1/src/goto-symex/memory_model_sc.cpp	2015-11-14 22:55:38.731184192 +0000
++++ walcyrie-cbmc-5.1/src/goto-symex/memory_model_sc.cpp	2015-11-14 23:04:07.943019977 +0000
+@@ -29,11 +29,20 @@
+ 
+   build_event_lists(equation);
+   build_clock_type(equation);
+-  
++
++#ifdef WALCYRIE
++  build_rw(equation);
++  build_ppo(equation);
++
++  generate_succ_constraints(equation);
++  generate_match_constraints(equation);
++  write_serialization_external(equation);
++#else  
+   read_from(equation);
+   write_serialization_external(equation);
+   program_order(equation);
+   from_read(equation);
++#endif
+ }
+ 
+ /*******************************************************************\
+@@ -109,6 +118,355 @@
+   }
+ }
+ 
++#ifdef WALCYRIE
++
++/*******************************************************************\
++
++Function: memory_model_sct::gt
++
++  Inputs: 
++
++ Outputs:
++
++ Purpose:
++
++\*******************************************************************/
++
++exprt memory_model_sct::gt(event_it e1, event_it e2)
++{
++  return not_exprt(before(e1, e2));
++}
++
++/*******************************************************************\
++
++Function: memory_model_sct::genvar
++
++  Inputs: 
++
++ Outputs:
++
++ Purpose:
++
++\*******************************************************************/
++
++exprt memory_model_sct::genvar(
++  const event_it &r, const event_it &w)
++{
++  assert(is_shared_read(r) && is_shared_write(w));
++  std::ostringstream rss, wss;
++  rss << "RW_READ" 
++      << "$" << r->source.thread_nr << "$"
++      << id2string(id(r)) ;
++
++  wss << "_WRITE" 
++      << "$" << w->source.thread_nr << "$"
++      << id2string(id(w)) ;
++
++  irep_idt symbol = rss.str() + wss.str();
++  return symbol_exprt(symbol, bool_typet());
++}
++
++/*******************************************************************\
++
++Function: memory_model_sct::funct_latesw
++
++  Inputs:
++
++ Outputs:
++
++ Purpose:
++
++\*******************************************************************/
++
++exprt memory_model_sct::funct_latestw(
++  const event_it &r, const event_it &w)
++{
++  assert(is_shared_read(r) && is_shared_write(w));
++  exprt::operandst funct_operands, latestw_operands;
++
++  for(event_listt::const_iterator
++      w_it = matching_writes[r].begin();
++      w_it != matching_writes[r].end(); w_it++)
++  {
++    if(w == *w_it)
++      continue;
++
++    exprt Xm = genvar(r, *w_it);
++    funct_operands.push_back(not_exprt(Xm));
++
++    exprt latestw_lhs, latestw_rhs, latestw;
++    // TODO: further static pruning?
++    if((po(*w_it, w) && !program_order_is_relaxed(*w_it, w)) ||
++          (po(r, *w_it) && !program_order_is_relaxed(r, *w_it)))
++        continue;
++      else if(po(r, w) && !program_order_is_relaxed(r, w))
++        latestw = false_exprt(); // exit(0) even?
++      else if((po(w, *w_it) && !program_order_is_relaxed(w, *w_it)) && 
++              (po(*w_it, r) && !program_order_is_relaxed(*w_it, r)))
++        latestw = implies_exprt((*w_it)->guard, false_exprt());
++      else if(po(w, *w_it) && !program_order_is_relaxed(w, *w_it))
++        latestw = implies_exprt((*w_it)->guard, before(r, *w_it));
++      else
++      {
++        latestw_lhs = and_exprt(gt(r, *w_it), (*w_it)->guard);
++        latestw_rhs = gt(w, *w_it);
++        latestw = implies_exprt(latestw_lhs, latestw_rhs);
++      }
++    latestw_operands.push_back(latestw);
++  }
++
++  return and_exprt (conjunction(funct_operands), 
++                    conjunction(latestw_operands));
++}
++
++/*******************************************************************\
++
++Function: memory_model_sct::transitive_reduction
++
++  Inputs:
++
++ Outputs:
++
++ Purpose:
++
++\*******************************************************************/
++
++void memory_model_sct::transitive_reduction(const  event_it &e1, const  event_it &e2)
++{
++  if (e1 == e2)
++    return;
++
++  // transitive closed ppo
++  tsuccessors[e1].insert(e2);
++
++  // pick the edges to remove
++  if(!predecessors[e2].empty())
++  {
++    event_listt::const_iterator pred  = predecessors[e2].begin();
++    event_listt::const_iterator done = predecessors[e2].end();
++
++    for(;pred != done ; pred++)
++    {
++      // see if e1 figures in pred's tsuccessors
++      if(tsuccessors[*pred].find(e1) != tsuccessors[*pred].end())
++      {
++        event_listt::iterator is = successors[*pred].begin();
++        event_listt::iterator js = successors[*pred].end();
++        successors[*pred].erase(std::remove(is, js, e2),
++        successors[*pred].end());
++
++        event_listt::iterator ip = predecessors[e2].begin();
++        event_listt::iterator jp = predecessors[e2].end();
++        predecessors[e2].erase(std::remove(ip, jp, *pred),
++        predecessors[e2].end());
++      }
++    }
++  }
++
++  // transitive reduced ppo
++  predecessors[e2].push_back(e1);
++  successors[e1].push_back(e2);
++}
++
++/*******************************************************************\
++
++Function: memory_model_sct::build_rw
++
++  Inputs:
++
++ Outputs:
++
++ Purpose:
++
++\*******************************************************************/
++
++void  memory_model_sct::build_rw(
++  symex_target_equationt &equation)
++{
++
++  print(12, "Populating rw");
++
++  for(address_mapt::const_iterator
++      a_it=address_map.begin();
++      a_it!=address_map.end();
++      a_it++)
++  {
++    const a_rect &a_rec=a_it->second;
++  
++    for(event_listt::const_iterator
++        r_it=a_rec.reads.begin();
++        r_it!=a_rec.reads.end();
++        r_it++)
++    {
++      const event_it r=*r_it;
++      
++      for(event_listt::const_iterator
++          w_it=a_rec.writes.begin();
++          w_it!=a_rec.writes.end();
++          ++w_it)
++      {
++        const event_it w=*w_it;
++       
++        if(po(r, w) && !program_order_is_relaxed(r, w))
++          continue; // rw contradicts po
++
++        matching_reads[w].push_back(r);
++        matching_writes[r].push_back(w);
++        rw_matches.push_back(rw_matcht(r, w));
++      }
++    }
++  }
++}
++
++/*******************************************************************\
++
++Function: memory_model_sct::build_ppo
++
++  Inputs:
++
++ Outputs:
++
++ Purpose:
++
++\*******************************************************************/
++
++void  memory_model_sct::build_ppo(
++  symex_target_equationt &equation)
++{
++  print(12, "Populating ppo");
++
++  // TODO: push the per_thread_map into the sct.
++  per_thread_mapt per_thread_map;
++  build_per_thread_map(equation, per_thread_map);
++
++  thread_spawn(equation, per_thread_map);
++ 
++  // iterate over threads
++  for(per_thread_mapt::const_iterator
++      t_it=per_thread_map.begin();
++      t_it!=per_thread_map.end();
++      t_it++)
++  {
++    const event_listt &events=t_it->second; 
++
++    for(event_listt::const_iterator
++        e_it1=events.begin();
++        e_it1!=events.end();
++        e_it1++)
++    {
++      if(is_memory_barrier(*e_it1))
++         continue;
++
++      for(event_listt::const_iterator
++        e_it2=e_it1+1; 
++        e_it2!=events.end();
++        e_it2++)
++      {
++        if(is_memory_barrier(*e_it2))
++         continue; 
++
++        transitive_reduction(*e_it1, *e_it2);
++      } 
++    }
++  }
++}
++
++/*******************************************************************\
++
++Function: memory_model_sct::generate_succ_constraint
++
++  Inputs:
++
++ Outputs:
++
++ Purpose:
++
++\*******************************************************************/
++
++void  memory_model_sct::generate_succ_constraints(
++  symex_target_equationt &equation)
++{
++  print(8, "Adding succ constraints");
++
++  per_thread_mapt per_thread_map;
++  build_per_thread_map(equation, per_thread_map);
++ 
++  for(per_thread_mapt::const_iterator
++      t_it=per_thread_map.begin();
++      t_it!=per_thread_map.end();
++      t_it++)
++  {
++    const event_listt &events=t_it->second;
++
++    for(event_listt::const_iterator
++        p_it=events.begin();
++        p_it!=events.end();
++        p_it++)
++    {
++      for(event_listt::const_iterator
++        q_it=successors[*p_it].begin();
++        q_it!=successors[*p_it].end();
++        q_it++)
++      {
++        exprt succ = before(*p_it, *q_it);
++        add_constraint(equation, succ, "succ", (*p_it)->source);
++      }
++    }
++  }
++}
++
++/*******************************************************************\
++
++Function: memory_model_sct::generate_match_constraints
++
++  Inputs:
++
++ Outputs:
++
++ Purpose:
++
++\*******************************************************************/
++
++void  memory_model_sct::generate_match_constraints(
++  symex_target_equationt &equation)
++{
++  print(8, "Adding ext/m2clk constraints");
++
++  if(0 == rw_matches.size())
++  {
++    print(equation.SSA_steps.size(), "empty rw");
++    return;
++  }
++
++  for(rw_matchst::const_iterator
++      rw_it=rw_matches.begin();
++      rw_it!=rw_matches.end();
++      rw_it++)
++  {
++    rw_matcht m = *rw_it;
++    event_it r = m.first;
++    event_it w = m.second;
++    exprt Xm = genvar(r, w);
++
++    exprt guards   = and_exprt(r->guard, w->guard);
++    exprt ext_rhs  = and_exprt(guards, funct_latestw(r, w));
++    exprt ext = and_exprt(implies_exprt(Xm, ext_rhs),
++                          implies_exprt(ext_rhs, Xm));
++    add_constraint(equation, ext, "ext", r->source);
++
++    exprt m2clk_rhs_before = before(w, r);
++    exprt m2clk_rhs_equal  = equal_exprt(r->ssa_lhs, w->ssa_lhs);
++    exprt m2clk_rhs = and_exprt(
++                        m2clk_rhs_before,
++                        m2clk_rhs_equal);
++    exprt m2clk = implies_exprt(Xm, m2clk_rhs);
++    add_constraint(equation, m2clk, "m2clk", r->source);
++  }
++}
++
++
++#endif
++
+ /*******************************************************************\
+ 
+ Function: memory_model_sct::thread_spawn
+@@ -147,17 +505,16 @@
+       // require explicit handling of these.
+       event_listt::const_iterator n_it=next_thread->second.begin();
+       for( ;
+-          n_it!=next_thread->second.end() &&
+-          (*n_it)->is_memory_barrier();
+-          ++n_it)
+-        ;
+-
+-      if(n_it!=next_thread->second.end())
+-        add_constraint(
+-          equation,
+-          before(e_it, *n_it),
+-          "thread-spawn",
+-          e_it->source);
++          n_it!=next_thread->second.end();
++          n_it++)
++      {
++          if(!(*n_it)->is_memory_barrier())
++            add_constraint(
++              equation,
++              before(e_it, *n_it),
++              "thread-spawn",
++              e_it->source);
++      }
+     }
+   }
+ }
+diff -Naur stock-cbmc-5.1/src/goto-symex/memory_model_sc.h walcyrie-cbmc-5.1/src/goto-symex/memory_model_sc.h
+--- stock-cbmc-5.1/src/goto-symex/memory_model_sc.h	2015-11-14 22:55:38.713184127 +0000
++++ walcyrie-cbmc-5.1/src/goto-symex/memory_model_sc.h	2015-11-14 23:03:32.563892430 +0000
+@@ -9,6 +9,11 @@
+ #ifndef CPROVER_MEMORY_MODEL_SC_H
+ #define CPROVER_MEMORY_MODEL_SC_H
+ 
++
++#ifdef WALCYRIE
++#include <algorithm>
++#endif
++
+ #include "memory_model.h"
+ 
+ class memory_model_sct:public memory_model_baset
+@@ -36,6 +41,39 @@
+   void program_order(symex_target_equationt &equation);
+   void from_read(symex_target_equationt &equation);
+   void write_serialization_external(symex_target_equationt &equation);
++
++#ifdef WALCYRIE
++
++  typedef std::map<
++    partial_order_concurrencyt::event_it,
++    event_listt> event2listt;
++
++  typedef std::map<
++    partial_order_concurrencyt::event_it,
++    std::set<event_it> > event2sett;
++
++  typedef std::pair<event_it, event_it> rw_matcht;
++  typedef std::vector<rw_matcht> rw_matchst;
++
++  event2listt successors, predecessors;
++  event2listt matching_reads, matching_writes;
++  event2sett tsuccessors;
++  rw_matchst rw_matches;
++
++  /* gt = \neg before(...) */
++  void transitive_reduction
++              (const event_it &e1, const event_it &e2);
++  virtual void build_ppo(symex_target_equationt &equation);
++  void build_rw(symex_target_equationt &equation);
++
++  exprt genvar(const event_it &r, const event_it &w);
++  exprt gt(event_it e1, event_it e2);
++  exprt funct_latestw(const event_it &r, const event_it &w);
++
++  void  generate_succ_constraints(symex_target_equationt &equation);
++  void  generate_match_constraints(symex_target_equationt &equation);
++
++#endif
+ };
+ 
+ #endif
+diff -Naur stock-cbmc-5.1/src/goto-symex/memory_model_tso.cpp walcyrie-cbmc-5.1/src/goto-symex/memory_model_tso.cpp
+--- stock-cbmc-5.1/src/goto-symex/memory_model_tso.cpp	2015-11-14 22:55:38.746184246 +0000
++++ walcyrie-cbmc-5.1/src/goto-symex/memory_model_tso.cpp	2015-11-14 23:05:53.272400051 +0000
+@@ -29,13 +29,24 @@
+ 
+   build_event_lists(equation);
+   build_clock_type(equation);
+-  
++ 
++#ifdef WALCYRIE
++  build_rw(equation);
++  build_ppo(equation);
++
++  generate_succ_constraints(equation);
++  generate_match_constraints(equation);
++  write_serialization_external(equation);
++#else  
+   read_from(equation);
+   write_serialization_external(equation);
+   program_order(equation);
++
+ #ifndef CPROVER_MEMORY_MODEL_SUP_CLOCK
+   from_read(equation);
+ #endif
++
++#endif 
+ }
+ 
+ /*******************************************************************\
+@@ -52,8 +63,12 @@
+ 
+ exprt memory_model_tsot::before(event_it e1, event_it e2)
+ {
++#ifdef WALCYRIE
++  return memory_model_sct::before(e1, e2);
++#else
+   return partial_order_concurrencyt::before(
+     e1, e2, AX_SC_PER_LOCATION | AX_PROPAGATION);
++#endif
+ }
+ 
+ /*******************************************************************\
+@@ -209,3 +224,126 @@
+   }
+ }
+ 
++#ifdef WALCYRIE
++
++/*******************************************************************\
++
++Function: memory_model_tsot::build_ppo
++
++  Inputs:
++
++ Outputs:
++
++ Purpose:
++
++\*******************************************************************/
++
++void memory_model_tsot::build_ppo(symex_target_equationt &equation)
++{
++  per_thread_mapt per_thread_map;
++  build_per_thread_map(equation, per_thread_map);
++
++  thread_spawn(equation, per_thread_map);
++
++  // iterate over threads
++  for(per_thread_mapt::const_iterator
++      t_it=per_thread_map.begin();
++      t_it!=per_thread_map.end();
++      t_it++)
++  {
++    const event_listt &events=t_it->second;
++
++    // iterate over relevant events in the thread
++    for(event_listt::const_iterator
++        e_it=events.begin();
++        e_it!=events.end();
++        e_it++)
++    {
++      if(is_memory_barrier(*e_it))
++        continue;
++
++      event_listt::const_iterator next=e_it;
++      ++next;
++
++      exprt mb_guard_r, mb_guard_w;
++      mb_guard_r.make_false();
++      mb_guard_w.make_false();
++
++      for(event_listt::const_iterator
++          e_it2=next;
++          e_it2!=events.end();
++          e_it2++)
++      {
++        if((is_spawn(*e_it) && !is_memory_barrier(*e_it2)) ||
++           is_spawn(*e_it2))
++        {
++          transitive_reduction(*e_it,*e_it2);
++
++          if(is_spawn(*e_it2))
++            break;
++          else
++            continue;
++        }
++
++        if(is_memory_barrier(*e_it2))
++        {
++          const codet &code=to_code((*e_it2)->source.pc->code);
++
++          if(is_shared_read(*e_it) &&
++             !code.get_bool(ID_RRfence) &&
++             !code.get_bool(ID_RWfence))
++            continue;
++          else if(is_shared_write(*e_it) &&
++             !code.get_bool(ID_WRfence) &&
++             !code.get_bool(ID_WWfence))
++            continue;
++
++          if(code.get_bool(ID_RRfence) ||
++             code.get_bool(ID_WRfence))
++            mb_guard_r=or_exprt(mb_guard_r, (*e_it2)->guard);
++
++          if(code.get_bool(ID_RWfence) ||
++             code.get_bool(ID_WWfence))
++            mb_guard_w=or_exprt(mb_guard_w, (*e_it2)->guard);
++
++          continue;
++        }
++
++        exprt cond=true_exprt();
++        exprt ordering=nil_exprt();
++
++        if(address(*e_it)==address(*e_it2))
++          transitive_reduction(*e_it,*e_it2);
++        else if(program_order_is_relaxed(*e_it, *e_it2))
++        {
++          if(is_shared_read(*e_it2))
++            cond=mb_guard_r;
++          else
++            cond=mb_guard_w;
++          simplify(cond, ns);
++
++          if(!cond.is_false())
++          {
++            if(cond.is_true())
++              transitive_reduction(*e_it,*e_it2);
++            else
++            {
++              //if(ordering.is_nil())
++              ordering=partial_order_concurrencyt::before(
++              *e_it, *e_it2, AX_PROPAGATION);
++
++              add_constraint(
++                equation,
++                implies_exprt(cond, ordering),
++                "po",
++                (*e_it)->source);
++            }
++        }
++       }else
++        transitive_reduction(*e_it,*e_it2);
++       }
++    }
++  }
++}
++
++#endif
+diff -Naur stock-cbmc-5.1/src/goto-symex/memory_model_tso.h walcyrie-cbmc-5.1/src/goto-symex/memory_model_tso.h
+--- stock-cbmc-5.1/src/goto-symex/memory_model_tso.h	2015-11-14 22:55:38.717184142 +0000
++++ walcyrie-cbmc-5.1/src/goto-symex/memory_model_tso.h	2015-11-14 23:02:35.227685725 +0000
+@@ -27,6 +27,11 @@
+     partial_order_concurrencyt::event_it e1,
+     partial_order_concurrencyt::event_it e2) const;
+   void program_order(symex_target_equationt &equation);
++
++#ifdef WALCYRIE
++  void build_ppo(symex_target_equationt &equation);
++#endif
++
+ };
+ 
+ #endif
+diff -Naur stock-cbmc-5.1/src/goto-symex/partial_order_concurrency.cpp walcyrie-cbmc-5.1/src/goto-symex/partial_order_concurrency.cpp
+--- stock-cbmc-5.1/src/goto-symex/partial_order_concurrency.cpp	2015-11-14 22:55:38.738184217 +0000
++++ walcyrie-cbmc-5.1/src/goto-symex/partial_order_concurrency.cpp	2015-11-16 18:17:02.989723764 +0000
+@@ -280,11 +280,14 @@
+ void partial_order_concurrencyt::build_clock_type(
+   const symex_target_equationt &equation)
+ {
++#ifdef WMM_RATIONAL_CLK
++  clock_type=rational_typet();
++#else
+   assert(!numbering.empty());
+-
+   mp_integer width=address_bits(numbering.size());
+   assert(width<std::numeric_limits<unsigned>::max());
+   clock_type=unsignedbv_typet(integer2unsigned(width));
++#endif
+ }
+ 
+ /*******************************************************************\
+diff -Naur stock-cbmc-5.1/src/solvers/sat/satcheck_minisat2.cpp walcyrie-cbmc-5.1/src/solvers/sat/satcheck_minisat2.cpp
+--- stock-cbmc-5.1/src/solvers/sat/satcheck_minisat2.cpp	2015-11-14 22:55:39.231185995 +0000
++++ walcyrie-cbmc-5.1/src/solvers/sat/satcheck_minisat2.cpp	2015-11-17 15:02:16.505206369 +0000
+@@ -194,6 +194,38 @@
+   clause_counter++;
+ }
+ 
++#ifdef WMM_MINSAT2_STATS
++/*******************************************************************\
++
++Function: print_minisat_stats
++  Inputs:
++
++ Outputs:
++
++ Purpose:
++
++\*******************************************************************/
++
++template<typename T>
++void print_minisat_stats(T *solver)
++{
++   printf("restarts              : %"PRIu64"\n", solver->starts);
++   printf("conflicts             : %-12"PRIu64"\n", solver->conflicts);
++
++   printf("decisions             : %-12"PRIu64"(%4.2f %% random)\n", 
++                                  solver->decisions, 
++                                  ((float)solver->rnd_decisions * 100)
++                                  / (float)solver->decisions);
++   printf("propagations          : %-12"PRIu64"\n", solver->propagations);
++
++   printf("conflict literals     : %-12"PRIu64"%4.2f\n", 
++                                  solver->tot_literals, 
++                                  ((solver->max_literals - solver->tot_literals)
++                                  * 100)
++                                  / (double)solver->max_literals);
++}
++#endif
++
+ /*******************************************************************\
+ 
+ Function: satcheck_minisat2_baset::prop_solve
+@@ -231,6 +263,9 @@
+ 
+     if(solver->solve(MiniSat_assumptions))
+     {
++#ifdef WMM_MINSAT2_STATS
++      print_minisat_stats(solver);
++#endif
+       messaget::status() << 
+         "SAT checker: negated claim is SATISFIABLE, i.e., does not hold" << eom;
+       assert(solver->model.size()!=0);
+@@ -239,6 +274,9 @@
+     }
+     else
+     {
++#ifdef WMM_MINSAT2_STATS
++      print_minisat_stats(solver);
++#endif
+       messaget::status() <<
+         "SAT checker: negated claim is UNSATISFIABLE, i.e., holds" << eom;
+     }
