@@ -78,7 +78,7 @@ The $cwd/walcyrie/bin/log directory contains all the log files we obtained for g
 
 ##Alternate Sources
 
-Secondary sources to obtain our artefact, as a VM image, is from 
+An alternate source to obtain our artefact, as a VM image, is from 
 
 	http://www.cprover.org/wmm/tc/ppopp16/
 
