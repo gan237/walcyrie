@@ -39,7 +39,7 @@ Now you should have the binaries `walcyrie` and `cbmc-po` in the $cwd/walycrie/b
 
 ###Step 3: Running the Artefact
 
-First check below for expected time scales of the experiments. When ready, do:
+First check below for expected time scales of the experiments. 	A complete run takes about 4 days<sup>§</sup>. When ready to run the experiments, do:
 
 	$cwd/walcyrie/bin/experiments.sh
 
@@ -54,7 +54,6 @@ This will result in twelve log files, six each under the $cwd/run/svcomp15 and $
 	Use tail -f $cwd/runs/litmus/nohup.out to track the Litmus runs.
 	Use tail -f $cwd/runs/svcomp15/log.svcomp15.6.900s.$exe.$mm to track the SV-COMP15 runs.
 
-	A complete run takes about 4 days<sup>§</sup>.
 <div align="right">
 <i>§ On a 3GHz CPU</i>.
 </div>
