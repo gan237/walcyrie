@@ -57,8 +57,8 @@ echo "${green}Both cpbm & runsolver are correctly installed${reset}...";
 pushd .
 
 echo "${red}############################################################${reset}"
-echo       "Each of the SIX Litmus runs will take upward ${red}2:30hrs${reset} @ 3GHz"
-echo       "Allow ${red}6*2:30hrs${reset} for Litmus tests"
+echo       "Each of the SIX Litmus runs will take upward ${red}3:00hrs${reset} @ 3GHz"
+echo       "Allow ${red}6*3:00hrs${reset} for Litmus tests"
 echo "${red}############################################################${reset}"
 
 
