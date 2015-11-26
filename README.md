@@ -48,8 +48,8 @@ This will result in twelve log files, six each under the $cwd/run/svcomp15 and $
 <div align="center">
 <b>Achtung!</b>
 </div>
-	Each individual Litmus test will take 3:00hrs. A complete Litmus run will take 6*3:00hrs.
-	Each SV-COMP15 test will take 12:30hrs.	A complete SVCOMP15 run will take 6*12:30hrs.
+	Each individual Litmus test will take ~3:00hrs. A complete Litmus run will take >6*3:00hrs.
+	Each SV-COMP15 test will take ~12:30hrs. A complete SVCOMP15 run will take >6*12:30hrs.
 
 	Use tail -f $cwd/runs/litmus/nohup.out to track the Litmus runs.
 	Use tail -f $cwd/runs/svcomp15/log.svcomp15.6.900s.$exe.$mm to track the SV-COMP15 runs.
