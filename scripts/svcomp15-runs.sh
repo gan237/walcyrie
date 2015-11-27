@@ -101,7 +101,7 @@ sleep 1;
 nohup $SCRIPT_PATH/run-svcomp15.sh  $SVCOMP15_IN/list.i.svcomp15.tso  $SVCOMP15_IN 6 log cbmc-po 900 tso
 
 echo -en '\t\t'
-echo "${green}Starting the CBMC-PO SVCOMP15 TSO run${reset}..."
+echo "${green}Starting the CBMC-PO SVCOMP15 PSO run${reset}..."
 echo -en '\t\t'
 echo "(${green}Check $SVCOMP15_OUT/log.svcomp15.6.900s.cbmc-po.pso to track progress${reset})..."
 echo -en '\t\t'
