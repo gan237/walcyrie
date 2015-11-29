@@ -39,7 +39,7 @@ Now you should have the binaries `walcyrie` and `cbmc-po` in the $cwd/walycrie/b
 
 ###Step 3: Running the Artefact
 
-First check below for expected time scales of the experiments. 	A complete run takes about 4 days<sup>§</sup>. When ready to run the experiments, do:
+First check below for expected time scales of the experiments. 	A complete run takes about 7 days<sup>§</sup>. When ready to run the experiments, do:
 
 	$cwd/walcyrie/bin/experiments.sh
 
