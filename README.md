@@ -13,7 +13,7 @@ The artefact can be compiled and run on any Linux machine. You will need a C/C++
 
 To run the tests, you will need `cpbm` (included) and `runsolver` (included). 
 
-To produce the plots, we require `awk`, `sed`, `perl` (Switch.pm), `gnuplot`, `epstopdf` and `pdf90` to be in the $PATH.
+To produce the plots, we require `awk`, `sed`, `perl` (Switch.pm, Text::CSV), `gnuplot`, `epstopdf` and `pdf90` to be in the $PATH.
 
 
 ###Step 1: Obtaining the Artefact
