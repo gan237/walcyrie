@@ -11,9 +11,9 @@ Here we describe the step by step instructions to obtain, compile and run our ar
 
 The artefact can be compiled and run on any Linux machine. You will need a C/C++ compiler, Flex and Bison, and GNU make; the GNU Make version must be 3.81 or higher and the g++ version 4.6.x or higher. The `perl` and `lwp-download` (provided by libwww-perl in Ubuntu/Fedora) executables needs to be in the $PATH. Internet access is required for the automated download of MiniSAT2 sources. We assume you will be using a `bash` shell.
 
-To run the tests, you will need `cpbm` (included) and `runsolver` (included). 
+To run the tests, you will need `cpbm` (included) and `runsolver` (included).
 
-To produce the plots, we require `awk`, `sed`, `perl` (Switch.pm, Text::CSV), `gnuplot`, `epstopdf` and `pdf90` to be in the $PATH.
+To produce the plots, we require `awk`, `sed`, `perl` (Switch.pm, Text::CSV), `gnuplot`, `epstopdf` and `pdf90` to be in the $PATH. Also, include '.' to the $PATH (export PATH=$PATH:.).
 
 
 ###Step 1: Obtaining the Artefact
