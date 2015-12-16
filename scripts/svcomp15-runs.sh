@@ -21,7 +21,7 @@ tabs 4
 #read discardinput;
 
 shopt -s extglob
-rm -rf !(svcomp15-runs.sh)
+rm -rf !(svcomp15-runs.sh|svcomp15-runs-short.sh)
 
 echo -en '\t'
 echo "${green}Starting the WALCYRIE SVCOMP15 runs${reset}..."
