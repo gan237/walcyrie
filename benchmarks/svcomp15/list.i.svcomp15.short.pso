@@ -11,5 +11,5 @@
 ./pthread-wmm/mix022_pso.opt_false-unreach-call.i
 ./pthread-wmm/safe000_pso.oepc_true-unreach-call.i
 ./pthread-wmm/thin001_pso.oepc_true-unreach-call.i
-./pthread-wmm/thin001_pso.opt_true-unreach-call.i
 ./pthread-wmm/safe007_pso.oepc_true-unreach-call.i
+./pthread-wmm/rfi003_pso.opt_false-unreach-call.i
