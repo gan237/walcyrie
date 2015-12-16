@@ -58,6 +58,7 @@ This will result in twelve log files, six each under the $cwd/run/svcomp15 and $
 <i>§ On a 3GHz CPU</i>.
 </div>
 
+
 ###Step 4: Generating the Plots
 
 Simply do:
@@ -73,6 +74,16 @@ The $cwd/walcyrie/bin/log directory contains all the log files we obtained for g
 	cp logs/cbmc-po/log.svcomp15.* logs/walcyrie/log.svcomp15.* runs/svcomp15
 	./bin/plots.sh
 
+
+###Sample Run
+
+For a short, test run over a small subset of the SVCOMP15 suite, run the following command.
+
+	$cwd/walcyrie/bin/experiments-svcomp15-short.sh
+
+This run should get completed in under half an hour, and the results can be plotted using:
+
+	$cwd/walcyrie/bin/plots-svcomp15-short.sh
 
 ******
 
