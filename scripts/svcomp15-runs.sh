@@ -31,29 +31,29 @@ rm -f walcyrie
 ln -s $WALCYRIE_PATH/walcyrie .
 
 echo -en '\t\t'
+echo `date`
+echo -en '\t\t'
 echo "${green}Starting the WALCYRIE SVCOMP15 SC run${reset}..."
 echo -en '\t\t'
 echo "(${green}Check $SVCOMP15_OUT/log.svcomp15.6.900s.walcyrie.sc to track progress${reset})..."
-echo -en '\t\t'
-echo `date`
 sleep 1;
 nohup $SCRIPT_PATH/run-svcomp15.sh  $SVCOMP15_IN/list.i.svcomp15.sc  $SVCOMP15_IN 6 log walcyrie 900 sc
 
 echo -en '\t\t'
+echo `date`
+echo -en '\t\t'
 echo "${green}Starting the WALCYRIE SVCOMP15 TSO run${reset}..."
 echo -en '\t\t'
 echo "(${green}Check $SVCOMP15_OUT/log.svcomp15.6.900s.walcyrie.tso to track progress${reset})..."
-echo -en '\t\t'
-echo `date`
 sleep 1;
 nohup $SCRIPT_PATH/run-svcomp15.sh  $SVCOMP15_IN/list.i.svcomp15.tso  $SVCOMP15_IN 6 log walcyrie 900 tso
 
 echo -en '\t\t'
+echo `date`
+echo -en '\t\t'
 echo "${green}Starting the WALCYRIE SVCOMP15 PSO run${reset}..."
 echo -en '\t\t'
 echo "(${green}Check $SVCOMP15_OUT/log.svcomp15.6.900s.walcyrie.pso to track progress${reset})..."
-echo -en '\t\t'
-echo `date`
 sleep 1;
 nohup $SCRIPT_PATH/run-svcomp15.sh  $SVCOMP15_IN/list.i.svcomp15.pso  $SVCOMP15_IN 6 log walcyrie 900 pso
 
@@ -83,29 +83,29 @@ rm -f cbmc-po
 ln -s $WALCYRIE_PATH/cbmc-po .
 
 echo -en '\t\t'
+echo `date`
+echo -en '\t\t'
 echo "${green}Starting the CBMC-PO SVCOMP15 SC run${reset}..."
 echo -en '\t\t'
 echo "(${green}Check $SVCOMP15_OUT/log.svcomp15.6.900s.cbmc-po.sc to track progress${reset})..."
-echo -en '\t\t'
-echo `date`
 sleep 1;
 nohup $SCRIPT_PATH/run-svcomp15.sh  $SVCOMP15_IN/list.i.svcomp15.sc  $SVCOMP15_IN 6 log cbmc-po 900 sc
 
 echo -en '\t\t'
+echo `date`
+echo -en '\t\t'
 echo "${green}Starting the CBMC-PO SVCOMP15 TSO run${reset}..."
 echo -en '\t\t'
 echo "(${green}Check $SVCOMP15_OUT/log.svcomp15.6.900s.cbmc-po.tso to track progress${reset})..."
-echo -en '\t\t'
-echo `date`
 sleep 1;
 nohup $SCRIPT_PATH/run-svcomp15.sh  $SVCOMP15_IN/list.i.svcomp15.tso  $SVCOMP15_IN 6 log cbmc-po 900 tso
 
 echo -en '\t\t'
+echo `date`
+echo -en '\t\t'
 echo "${green}Starting the CBMC-PO SVCOMP15 PSO run${reset}..."
 echo -en '\t\t'
 echo "(${green}Check $SVCOMP15_OUT/log.svcomp15.6.900s.cbmc-po.pso to track progress${reset})..."
-echo -en '\t\t'
-echo `date`
 sleep 1;
 nohup $SCRIPT_PATH/run-svcomp15.sh  $SVCOMP15_IN/list.i.svcomp15.pso  $SVCOMP15_IN 6 log cbmc-po 900 pso
 
