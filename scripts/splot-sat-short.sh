@@ -78,7 +78,7 @@ echo 'set logscale y 2'                         >>  $gnuplot_file
 #echo 'set xrange[128:4096]'                      >>  $gnuplot_file
 #echo 'set xrange[128:4096]'                      >>  $gnuplot_file
 echo 'set xrange[128:2048]'                     >>  $gnuplot_file
-echo 'set yrange[128:2048]
+echo 'set yrange[128:2048]'
 
 echo 'set title "'$title'"'                     >> $gnuplot_file
 if [ $plot = $x11 ]; then
