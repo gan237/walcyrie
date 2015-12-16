@@ -13,15 +13,3 @@
 ./pthread/bigshot_p_false-unreach-call.i
 ./pthread-atomic/peterson_true-unreach-call.i
 ./pthread/lazy01_false-unreach-call.i
-./seq-pthread/cs_lazy_false-unreach-call.i
-./seq-pthread/cs_stateful_false-unreach-call.i
-./pthread/stateful01_false-unreach-call.i
-./pthread-lit/fkp2013_variant_false-unreach-call.i
-./seq-pthread/cs_stateful_true-unreach-call.i
-./seq-pthread/cs_time_var_mutex_true-unreach-call.i
-./pthread-atomic/time_var_mutex_true-unreach-call.i
-./seq-pthread/cs_peterson_true-unreach-call.i
-./pthread-ext/28_buggy_simple_loop1_vf_false-unreach-call.i
-./pthread/singleton_with-uninit-problems-true.i
-./pthread-ext/40_barrier_vf_false-unreach-call.i
-./pthread/fib_bench_false-unreach-call.i
