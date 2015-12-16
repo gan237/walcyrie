@@ -58,8 +58,8 @@ pushd .
 
 
 echo "${red}##################################################################${reset}"
-echo       "Each of the SIX SV-COMP15 run takes ~5${red}mins${reset} @ 3GHz"
-echo       "Allow ${red}6*5mins${reset} for SV-COMP15 tests"
+echo       "Each of the SIX SV-COMP15 run takes >3${red}mins${reset} @ 3GHz"
+echo       "Allow ${red}6*3mins${reset} for SV-COMP15 tests"
 echo "${red}##################################################################${reset}"
 
 
