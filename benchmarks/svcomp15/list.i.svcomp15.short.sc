@@ -11,5 +11,5 @@
 ./pthread-ext/29_conditionals_vs_true-unreach-call.i
 ./pthread/sigma_false-unreach-call.i
 ./pthread/bigshot_p_false-unreach-call.i
-/pthread-atomic/peterson_true-unreach-call.i
+./pthread-atomic/peterson_true-unreach-call.i
 ./pthread/lazy01_false-unreach-call.i
