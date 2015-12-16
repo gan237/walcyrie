@@ -56,7 +56,7 @@ cp cbmc/cbmc-po $ARTEFACT_ROOT/bin
 echo "${green}Cleaning up${reset}..."
 sleep 1
 make clean
-sed -i '/^#CXXFLAGS   += -DWALCYRIE/s/^//' config.inc
+sed -i '/^#CXXFLAGS   += -DWALCYRIE/s/^#//' config.inc
 
 echo "${green}All done${reset}."
 sleep 1
