@@ -72,8 +72,8 @@ gnuplot_file="gnuplot.$now.gp"
 #plot
 echo 'set xlabel "'$xlabel'"'                   >  $gnuplot_file
 echo 'set ylabel "'$ylabel'"'                   >> $gnuplot_file
-echo 'set xrange [0:10]'                      >> $gnuplot_file
-echo 'set yrange [0:10]'                      >> $gnuplot_file
+echo 'set xrange [0:60]'                      >> $gnuplot_file
+echo 'set yrange [0:60]'                      >> $gnuplot_file
 echo 'set title "'$title'"'                     >> $gnuplot_file
 if [ $plot = $x11 ]; then
   echo 'set terminal x11 persist'               >> $gnuplot_file
