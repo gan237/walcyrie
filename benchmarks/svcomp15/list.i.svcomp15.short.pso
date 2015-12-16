@@ -4,8 +4,6 @@
 ./pthread-wmm/thin000_pso.oepc_true-unreach-call.i
 ./pthread-wmm/safe036_pso.oepc_true-unreach-call.i
 ./pthread-wmm/safe036_pso.opt_true-unreach-call.i
-./pthread-wmm/safe000_pso.opt_true-unreach-call.i
-./pthread-wmm/safe007_pso.opt_true-unreach-call.i
 ./pthread-wmm/safe018_pso.opt_true-unreach-call.i
 ./pthread-wmm/safe018_pso.oepc_true-unreach-call.i
 ./pthread-wmm/safe000_pso.oepc_true-unreach-call.i
@@ -13,3 +11,5 @@
 ./pthread-wmm/thin001_pso.opt_true-unreach-call.i
 ./pthread-wmm/safe007_pso.oepc_true-unreach-call.i
 ./pthread-wmm/safe029_pso.oepc_false-unreach-call.i
+./pthread-wmm/rfi001_pso.opt_false-unreach-call.i
+./pthread-wmm/safe020_pso.oepc_true-unreach-call.i
