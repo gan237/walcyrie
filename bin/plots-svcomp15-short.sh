@@ -25,9 +25,9 @@ if [[ $? != 0 ]];then
 fi
 
 cp $SCRIPTS/gen-table.sh $SCRIPTS/4rows2table.pl .
-$SCRIPTS/splot-svcomp15.sh log.short.svcomp15.6.60s.walcyrie.sc log.short.svcomp15.6.60s.cbmc-po.sc WALCYRIE CBMC-PO SC
-$SCRIPTS/splot-svcomp15.sh log.short.svcomp15.6.60s.walcyrie.tso log.short.svcomp15.6.60s.cbmc-po.tso WALCYRIE CBMC-PO TSO
-$SCRIPTS/splot-svcomp15.sh log.short.svcomp15.6.60s.walcyrie.pso log.short.svcomp15.6.60s.cbmc-po.pso WALCYRIE CBMC-PO PSO
+$SCRIPTS/splot-svcomp15-short.sh log.short.svcomp15.6.60s.walcyrie.sc log.short.svcomp15.6.60s.cbmc-po.sc WALCYRIE CBMC-PO SC
+$SCRIPTS/splot-svcomp15-short.sh log.short.svcomp15.6.60s.walcyrie.tso log.short.svcomp15.6.60s.cbmc-po.tso WALCYRIE CBMC-PO TSO
+$SCRIPTS/splot-svcomp15-short.sh log.short.svcomp15.6.60s.walcyrie.pso log.short.svcomp15.6.60s.cbmc-po.pso WALCYRIE CBMC-PO PSO
 rm -f gen-table.sh 4rows2table.pl
 
 echo "${green}SVCOMP15 plot done${reset}..."
@@ -43,9 +43,9 @@ sleep 1
 cd $SVCOMP15
 
 cp $SCRIPTS/10rows2table.pl .
-$SCRIPTS/splot-sat.sh log.short.svcomp15.6.60s.walcyrie.sc log.short.svcomp15.6.60s.cbmc-po.sc WALCYRIE CBMC-PO SC
-$SCRIPTS/splot-sat.sh log.short.svcomp15.6.60s.walcyrie.tso log.short.svcomp15.6.60s.cbmc-po.tso WALCYRIE CBMC-PO TSO
-$SCRIPTS/splot-sat.sh log.short.svcomp15.6.60s.walcyrie.pso log.short.svcomp15.6.60s.cbmc-po.pso WALCYRIE CBMC-PO PSO
+$SCRIPTS/splot-sat-short.sh  log.short.svcomp15.6.60s.walcyrie.sc log.short.svcomp15.6.60s.cbmc-po.sc WALCYRIE CBMC-PO SC
+$SCRIPTS/splot-sat-short.sh  log.short.svcomp15.6.60s.walcyrie.tso log.short.svcomp15.6.60s.cbmc-po.tso WALCYRIE CBMC-PO TSO
+$SCRIPTS/splot-sat-short.sh  log.short.svcomp15.6.60s.walcyrie.pso log.short.svcomp15.6.60s.cbmc-po.pso WALCYRIE CBMC-PO PSO
 rm -f  $SCRIPTS/10rows2table.pl
 
 echo "${green}Exploration Efficacy plots done${reset}..."
@@ -53,12 +53,8 @@ sleep 1
 
 popd
 ##################################################
-echo "${green}All done. The PDFs are under their respective benchmark directories${reset}..."
+echo "${green}All done. The PDFs are under $SVCOMP15/ ${reset}..."
 
-echo -n '3 plots'
-echo -en '\t'
-echo "->${green}$LITMUS/*.pdf ${reset}"
-ls -l $LITMUS/*.pdf
 
 echo -n '6 plots'
 echo -en '\t'
