@@ -1,15 +1,15 @@
-./pthread-wmm/safe017_tso.opt_true-unreach-call.i
-./pthread-wmm/safe026_tso.oepc_true-unreach-call.i
-./pthread-wmm/safe009_tso.opt_true-unreach-call.i
-./pthread-wmm/safe036_tso.opt_true-unreach-call.i
-./pthread-wmm/safe036_tso.oepc_true-unreach-call.i
-./pthread-wmm/safe007_tso.opt_true-unreach-call.i
-./pthread-wmm/safe017_tso.oepc_true-unreach-call.i
-./pthread-wmm/safe026_tso.opt_true-unreach-call.i
-./pthread-wmm/safe009_tso.oepc_true-unreach-call.i
-./pthread-wmm/thin001_tso.oepc_true-unreach-call.i
-./pthread-wmm/safe007_tso.oepc_true-unreach-call.i
-./pthread-wmm/thin001_tso.opt_true-unreach-call.i
-./pthread-wmm/safe011_tso.opt_true-unreach-call.i
-./pthread-wmm/safe000_tso.opt_true-unreach-call.i
-./pthread-wmm/safe000_tso.oepc_true-unreach-call.i
+./pthread-wmm/thin000_tso.oepc_true-unreach-call.i    UNSAT       4.318     49.105     UNSAT          9.669        59.121        UNSAT
+./pthread-wmm/thin000_tso.opt_true-unreach-call.i     UNSAT       4.382     49.074     UNSAT          9.853        59.016        UNSAT
+./pthread-wmm/safe010_tso.oepc_true-unreach-call.i    UNSAT       5.313     49.398     UNSAT          14.095       58.551        UNSAT
+./pthread-wmm/safe006_tso.opt_true-unreach-call.i     UNSAT       6.186     49.074     UNSAT          5.832        59.016        UNSAT
+./pthread-wmm/safe029_tso.opt_true-unreach-call.i     UNSAT       6.767     48.895     UNSAT          15.996       58.082        UNSAT
+./pthread-wmm/safe010_tso.opt_true-unreach-call.i     UNSAT       7.302     49.398     UNSAT          10.527       58.559        UNSAT
+./pthread-wmm/safe006_tso.oepc_true-unreach-call.i    UNSAT       7.347     49.109     UNSAT          8.395        59.027        UNSAT
+./pthread-wmm/safe022_tso.oepc_true-unreach-call.i    UNSAT       7.811     48.980     UNSAT          7.793        59.039        UNSAT
+./pthread-wmm/safe022_tso.opt_true-unreach-call.i     UNSAT       8.301     48.980     UNSAT          11.415       59.152        UNSAT
+./pthread-wmm/safe029_tso.oepc_true-unreach-call.i    UNSAT       8.367     48.887     UNSAT          15.175       57.980        UNSAT
+./pthread-wmm/safe033_tso.opt_true-unreach-call.i     UNSAT       9.545     53.102     UNSAT          19.531       68.062        UNSAT
+./pthread-wmm/safe033_tso.oepc_true-unreach-call.i    UNSAT       10.871    53.082     UNSAT          14.387       67.992        UNSAT
+./pthread-wmm/safe036_tso.opt_true-unreach-call.i     UNSAT       15.470    57.270     UNSAT          22.847       77.004        UNSAT
+./pthread-wmm/safe036_tso.oepc_true-unreach-call.i    UNSAT       15.500    57.238     UNSAT          37.736       77.020        UNSAT
+./pthread-wmm/safe009_tso.opt_true-unreach-call.i     UNSAT       14.348    75.516     UNSAT          326.889      118.305       UNSAT
