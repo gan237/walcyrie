@@ -25,7 +25,7 @@ echo "7 = $7"; #memory-model
 now=$(date +%Y-%m-%d.%H:%M:%S)
 logf=$lprefix.svcomp15.$nunwinds.$timeout"s".$exec_name.$mm
 
-if [ -a $logf ]; then
+if [ -e $logf ]; then
 echo "$logf exists!"
 exit -1
 fi
