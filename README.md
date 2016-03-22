@@ -1,6 +1,6 @@
 # PPoPP 2016 Artefact
 
-This artefact is for **The Virtues of Conflict: Analysing Modern Concurrency** accepted for PPoPP 2016.
+This artefact is for **The Virtues of Conflict: Analysing Modern Concurrency** accepted for PPoPP 2016. The paper is accessible from http://dl.acm.org/citation.cfm?id=2851165. The artefact also houses our PPoPP'16 presentation sources.
 
 ##Instructions
 
